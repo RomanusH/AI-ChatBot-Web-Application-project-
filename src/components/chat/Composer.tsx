@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 
 interface ComposerProps {
   value: string;
@@ -23,6 +23,11 @@ export function Composer({
 }: ComposerProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadState, setUploadState] = useState<{
+    file: File | null;
+    progress: number;
+    isUploading: boolean;
+  }>({ file: null, progress: 0, isUploading: false });
 
   useEffect(() => {
     const ta = textareaRef.current;
@@ -41,13 +46,73 @@ export function Composer({
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && onFileSelect) onFileSelect(file);
+    if (!file) return;
+
+    setUploadState({ file, progress: 0, isUploading: true });
+
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 15 + 5;
+      if (progress >= 100) {
+        progress = 100;
+        clearInterval(interval);
+        setTimeout(() => {
+          setUploadState({ file: null, progress: 0, isUploading: false });
+          if (onFileSelect) onFileSelect(file);
+        }, 400);
+      }
+      setUploadState((prev) => ({ ...prev, progress: Math.min(progress, 100) }));
+    }, 150);
+
     e.target.value = "";
+  };
+
+  const cancelUpload = () => {
+    setUploadState({ file: null, progress: 0, isUploading: false });
   };
 
   return (
     <footer className="border-t border-zinc-200 bg-white/80 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950/80 sm:px-6 lg:px-8">
-      <div className="mx-auto flex max-w-2xl items-end gap-2">
+      <div className="mx-auto flex max-w-2xl flex-col gap-2">
+        {uploadState.isUploading && uploadState.file && (
+          <div className="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-3 py-2 dark:border-zinc-700 dark:bg-zinc-800">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400">
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 10V3L4 14h7v7l9-11h-7z"
+                />
+              </svg>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="truncate text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                {uploadState.file.name}
+              </p>
+              <div className="mt-1 h-1.5 w-full rounded-full bg-zinc-200 dark:bg-zinc-700">
+                <div
+                  className="h-full rounded-full bg-blue-500 transition-all duration-150 ease-out"
+                  style={{ width: `${uploadState.progress}%` }}
+                />
+              </div>
+            </div>
+            <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              {Math.round(uploadState.progress)}%
+            </span>
+            <button
+              type="button"
+              onClick={cancelUpload}
+              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-zinc-400 hover:bg-zinc-100 hover:text-zinc-600 dark:hover:bg-zinc-700 dark:hover:text-zinc-300"
+              aria-label="Cancel upload"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        )}
+        <div className="flex items-end gap-2">
         <input
           ref={fileInputRef}
           type="file"
@@ -112,6 +177,7 @@ export function Composer({
           </svg>
         </button>
       </div>
-    </footer>
-  );
+    </div>
+  </footer>
+);
 }
