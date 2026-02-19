@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { json, apiError, parseJsonBody } from "@/lib/api";
-import { MessageRole } from "@prisma/client";
+
+type MessageRole = "user" | "assistant" | "system";
 
 export async function GET(
   _request: Request,
