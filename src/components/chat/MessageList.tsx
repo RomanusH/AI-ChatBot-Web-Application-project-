@@ -9,6 +9,9 @@ interface MessageListProps {
   noConversationSelected: boolean;
   isStreaming?: boolean;
   listRef?: React.RefObject<HTMLElement | null>;
+  onEdit?: (id: string, newContent: string) => void;
+  onDelete?: (id: string) => void;
+  onReaction?: (id: string, emoji: string) => void;
 }
 
 export function MessageList({
@@ -17,6 +20,9 @@ export function MessageList({
   noConversationSelected,
   isStreaming,
   listRef,
+  onEdit,
+  onDelete,
+  onReaction,
 }: MessageListProps) {
   if (noConversationSelected) {
     return (
@@ -56,6 +62,9 @@ export function MessageList({
             key={msg.id}
             message={msg}
             isStreaming={isStreaming && msg.id === messages[messages.length - 1]?.id && msg.role === "assistant"}
+            onEdit={onEdit}
+            onDelete={onDelete}
+            onReaction={onReaction}
           />
         ))}
       </div>
