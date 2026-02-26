@@ -1,37 +1,20 @@
 {
-  "name": "ai-chat-app",
-  "version": "0.1.0",
+  "name": "chat-ui",
+  "version": "1.0.0",
   "private": true,
+  "type": "module",
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "format": "prettier . --write",
-    "postinstall": "prisma generate"
+    "format:check": "prettier . --check",
+    "prepare": "husky"
   },
-  "dependencies": {
-    "@prisma/adapter-pg": "^7.4.0",
-    "@prisma/client": "^7.4.0",
-    "@tanstack/react-query": "^5.90.21",
-    "next": "16.1.6",
-    "pg": "^8.18.0",
-    "prisma": "^7.4.0",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "zustand": "^5.0.11"
-  },
-  "devDependencies": {
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
-    "@types/pg": "^8.16.0",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "babel-plugin-react-compiler": "1.0.0",
-    "eslint": "^9",
-    "eslint-config-next": "16.1.6",
-    "prettier": "^3.4.2",
-    "tailwindcss": "^4.2.0",
-    "typescript": "^5"
+  "lint-staged": {
+    "*.{js,css,html,json,md,yml,yaml}": [
+      "prettier --write"
+    ],
+    "*.js": [
+      "eslint --fix"
+    ]
   }
 }
